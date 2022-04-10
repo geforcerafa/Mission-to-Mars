@@ -1,5 +1,4 @@
 
-
 # Import Splinter, BeautifulSoup, and Pandas
 from splinter import Browser
 from bs4 import BeautifulSoup as soup
@@ -7,6 +6,8 @@ import pandas as pd
 import datetime as dt
 from webdriver_manager.chrome import ChromeDriverManager
 
+executable_path = {'executable_path': ChromeDriverManager().install()}
+browser = Browser('chrome', **executable_path, headless=True)
 
 def scrape_all():
     # Initiate headless driver for deployment
@@ -21,11 +22,18 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+
+        "hemispheres": hemispheres(browser), 
+        "ce_hemisphere": ce_hemisphere(browser), 
+        "sch_hemisphere": sch_hemisphere(browser), 
+        "sy_m_hemisphere": sy_m_hemisphere(browser),
+        "va_m_hemisphere": va_m_hemisphere(browser), 
+        
     }
 
     # Stop webdriver and return data
-    browser.quit()
+    #browser.quit()
     return data
 
 
@@ -98,6 +106,97 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+
+def hemispheres(browser):
+
+    ce_hem_img_url = ce_hemisphere(browser)
+    sch_hem_img_url = sch_hemisphere(browser)
+    sy_m_hem_img_url = sy_m_hemisphere(browser)
+    va_m_hem_img_url = va_m_hemisphere(browser)
+    
+    hemispheres = [{"Cerberus Hemisphere Enhanced": ce_hem_img_url}, {"Schiaparelli Hemisphere Enhanced": sch_hem_img_url}, {"Syrtis Major Hemisphere Enhanced" : sy_m_hem_img_url}, {"Valles Marineris Hemisphere Enhanced" : va_m_hem_img_url}]
+    return hemispheres
+    
+
+def ce_hemisphere(browser):
+
+    #Visit URL
+    url = 'https://marshemispheres.com/images/full.jpg'
+    browser.visit(url)
+
+    #Parse the html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+    
+    try:
+        # Find the relative image url
+        ce_img_url = img_soup.select_one('body img').get("src")
+
+    except AttributeError:
+        return None
+
+    return ce_img_url
+
+def sch_hemisphere(browser):
+
+    #Visit URL
+    url = 'https://marshemispheres.com/images/schiaparelli_enhanced-full.jpg'
+    browser.visit(url)
+
+    #Parse the html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+    
+    try:
+        # Find the relative image url
+        sch_img_url = img_soup.select_one('body img').get('src')
+
+    except AttributeError:
+        return None
+
+    return sch_img_url
+
+def sy_m_hemisphere(browser):
+
+    #Visit URL
+    url = 'https://marshemispheres.com/images/syrtis_major_enhanced-full.jpg'
+    browser.visit(url)
+
+    #Parse the html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+    
+    try:
+        # Find the relative image url
+        sy_m_img_url = img_soup.select_one('body img').get('src')
+
+    except AttributeError:
+        return None
+
+    return sy_m_img_url
+
+def va_m_hemisphere(browser):
+
+    #Visit URL
+    url = 'https://marshemispheres.com/images/valles_marineris_enhanced-full.jpg'
+    browser.visit(url)
+
+    #Parse the html with soup
+    html = browser.html
+    img_soup = soup(html, 'html.parser')
+    
+    try:
+        # Find the relative image url
+        va_m_img_url = img_soup.select_one('body img').get('src')
+
+    except AttributeError:
+        return None
+
+    return va_m_img_url
+
+
+
+browser.quit()
 
 if __name__ == "__main__":
 
